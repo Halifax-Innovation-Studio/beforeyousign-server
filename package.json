@@ -1,0 +1,23 @@
+{
+  "name": "beforeyousign-server",
+  "version": "1.0.0",
+  "description": "OCR backend for BeforeYouSign",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "ocr",
+    "openai",
+    "leases",
+    "contracts"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "openai": "^5.1.0"
+  }
+}
