@@ -11,7 +11,6 @@ const openai = new OpenAI({
 });
 
 app.use(cors());
-
 app.use(express.json({ limit: '50mb' }));
 
 app.get('/health', (req, res) => {
@@ -42,7 +41,7 @@ app.post('/ocr', async (req, res) => {
               {
                 type: 'input_text',
                 text:
-                  'Extract all readable text from this apartment lease page. Return only the extracted text. Preserve formatting as much as possible.',
+                  'Extract all readable text from this apartment lease page. Return only the extracted text. Preserve formatting as much as possible. If text is unclear, mark it as [unclear].',
               },
               {
                 type: 'input_image',
@@ -53,24 +52,79 @@ app.post('/ocr', async (req, res) => {
         ],
       });
 
-      const extractedText = response.output_text || '';
-
       pageResults.push({
         pageNumber: i + 1,
-        text: extractedText,
+        text: response.output_text || '',
       });
     }
 
     const combinedText = pageResults
-      .map(
-        (page) =>
-          `Page ${page.pageNumber}:\n${page.text}`
-      )
+      .map((page) => `Page ${page.pageNumber}:\n${page.text}`)
       .join('\n\n');
+
+    console.log('Analyzing lease clauses...');
+
+    const analysisResponse = await openai.responses.create({
+      model: 'gpt-4.1-mini',
+      input: `
+You are helping a renter understand an apartment lease.
+
+Important:
+- Do not provide legal advice.
+- Provide educational information only.
+- Use plain English.
+- Focus on clauses an average renter should understand before signing.
+- If you are unsure, say it should be reviewed with a qualified professional.
+- Include page references when possible.
+
+Review the lease text below and identify:
+- important clauses
+- automatic renewal terms
+- notice requirements
+- unusual fees
+- penalties
+- pet restrictions
+- maintenance responsibilities
+- landlord entry rights
+- tenant obligations
+- early termination language
+- security deposit terms
+- anything a renter should ask questions about
+
+Return valid JSON only in this exact format:
+
+{
+  "findings": [
+    {
+      "title": "Short clause title",
+      "severity": "Common / Worth Reviewing / Potential Gotcha / Important",
+      "why": "Plain-English explanation of why this matters.",
+      "question": "A practical question the renter should ask.",
+      "page": "Page number or Unknown"
+    }
+  ]
+}
+
+Lease text:
+
+${combinedText}
+`,
+    });
+
+    let findings = [];
+
+    try {
+      const parsed = JSON.parse(analysisResponse.output_text || '{}');
+      findings = Array.isArray(parsed.findings) ? parsed.findings : [];
+    } catch (error) {
+      console.error('Failed to parse findings JSON:', error.message);
+      findings = [];
+    }
 
     res.json({
       pages: pageResults,
       combinedText,
+      findings,
     });
   } catch (error) {
     console.error(error);
