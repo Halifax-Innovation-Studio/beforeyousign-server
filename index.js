@@ -17,6 +17,30 @@ app.get('/health', (req, res) => {
   res.json({ ok: true });
 });
 
+function looksLikeRentalLease(text) {
+  const lower = text.toLowerCase();
+
+  const leaseTerms = [
+    'lease',
+    'tenant',
+    'landlord',
+    'rent',
+    'rental',
+    'premises',
+    'security deposit',
+    'damage deposit',
+    'term',
+    'occupancy',
+    'unit',
+    'apartment',
+    'residential',
+  ];
+
+  const matches = leaseTerms.filter((term) => lower.includes(term));
+
+  return matches.length >= 3;
+}
+
 app.post('/ocr', async (req, res) => {
   try {
     const { images } = req.body;
@@ -61,6 +85,17 @@ app.post('/ocr', async (req, res) => {
     const combinedText = pageResults
       .map((page) => `Page ${page.pageNumber}:\n${page.text}`)
       .join('\n\n');
+
+    if (
+      !combinedText ||
+      combinedText.trim().length < 50 ||
+      !looksLikeRentalLease(combinedText)
+    ) {
+      return res.status(400).json({
+        error:
+          'No text returned or this does not appear to be a rental lease. Please try again with a clear photo of your lease.',
+      });
+    }
 
     console.log('Analyzing lease clauses...');
 
