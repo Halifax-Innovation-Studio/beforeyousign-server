@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const OpenAI = require('openai');
+const subscriptionRoutes = require('./routes/subscription');
 
 const app = express();
 
@@ -12,6 +13,7 @@ const openai = new OpenAI({
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
+app.use('/api/subscription', subscriptionRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ ok: true });
