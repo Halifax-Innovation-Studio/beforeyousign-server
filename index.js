@@ -4,8 +4,10 @@ const express = require('express');
 const cors = require('cors');
 const OpenAI = require('openai');
 const subscriptionRoutes = require('./routes/subscription');
+const pdfReviewRoutes = require('./routes/pdf-review');
 
 const app = express();
+app.set('trust proxy', 1);
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -14,6 +16,7 @@ const openai = new OpenAI({
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use('/api/subscription', subscriptionRoutes);
+app.use('/pdf-review', pdfReviewRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ ok: true });
