@@ -31,7 +31,9 @@ async function requirePremium(req, res, next) {
     req.subscriptionStatus = status;
     next();
   } catch (err) {
-    console.error('[requirePremium]', err);
+    const detail = { message: err.message };
+    if (err.code) detail.code = err.code;
+    console.error('[requirePremium] DB error', detail);
     return res.status(500).json({ error: 'Failed to verify subscription.' });
   }
 }
