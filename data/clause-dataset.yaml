@@ -1,0 +1,165 @@
+# === bys-server snapshot provenance ===
+# Source: Signal-Intelligence/product/bys-clause-dataset-seed.yaml
+# Copied: 2026-06-11
+# schema_version: 1
+# sha256: 597a37e68383537336aafbcfbe53d51a6724a04c74d3afd694c3234b8ce9cd92
+#   (hash of the SI source file at copy time; provenance only — it does NOT
+#    mean the dataset is legally correct or complete)
+# status: seed-incomplete
+# Signal Intelligence remains the evidence/productization source; update this
+# snapshot by re-copying and re-hashing, not by editing rows here.
+# =======================================
+# BYS reference clause dataset — SEED (a37)
+# Status: SEED ONLY — 7 sample rows demonstrating structure. This dataset is
+# NOT complete and must not be represented as complete, validated, or
+# production-ready. Target size per the CC/CD practice (a11): 20-50 rows,
+# including >=10 complete / >=10 missing-field leases for the completeness
+# check (a36 success criteria). Current coverage is far below both targets.
+# Purpose: evidence/productization asset (expected product behaviour per
+# clause situation). It records what rules say and what BYS should flag and
+# explain — it is NOT legal interpretation or legal advice.
+# Provenance discipline: every row names its source and read date. statute_ref
+# is a TO-TRACE placeholder until each rule is verified against the
+# Residential Tenancies Act / Regulations text (the ship gate from a36/a38).
+# All example_clause_text values are SYNTHETIC examples written for this
+# dataset; none are drawn from real leases.
+# Validity discipline: valid_from / valid_to bound the period the rule row
+# applies; null valid_to = currently in force, no known end date; the
+# 2027-12-31 rent-cap expiry is a live valid_to (see
+# content/ns-tenancy-dates-calendar.md - calendar and dataset update together).
+
+dataset_version: 0.1-seed
+schema_version: 1
+created: 2026-06-10
+status: seed-incomplete
+row_count: 7
+primary_source: &nspage
+  title: "Residential Tenancies Program: legislative changes"
+  url: "https://www.novascotia.ca/residential-tenancies-program-legislative-changes"
+  publisher: "Government of Nova Scotia"
+  read_date: 2026-06-10
+  note: "Summary page, not the statute. Trace-to-Act required before any row ships in product or content."
+
+fields_doc:
+  id: "stable row id"
+  clause_type: "category used by lens/feature mapping"
+  jurisdiction: "always NS in v1 (scope rule: NS depth before breadth)"
+  rule_summary: "the rule in plain language, as understood from the source"
+  statute_ref: "Act/Regulation provision - TO-TRACE placeholder until verified"
+  source: "provenance (anchored to primary_source unless noted)"
+  valid_from: "date the rule takes effect (null = to confirm during trace)"
+  valid_to: "date the rule ends (null = in force, no known end)"
+  example_clause_text: "SYNTHETIC sample clause for eval use"
+  expected_flag: "what BYS v-next should surface (ok | flag | missing | out-of-scope)"
+  expected_explanation_points: "what a correct explanation must cover"
+  notes: "row-level caveats"
+
+rows:
+  - id: rc-001
+    clause_type: rent-escalation
+    jurisdiction: NS
+    rule_summary: "Rent increases are capped at 5% per year from 1 Jan 2026; cap regime in place until 31 Dec 2027."
+    statute_ref: "TO-TRACE (Interim Residential Rental Increase Cap Act + RTA)"
+    source: *nspage
+    valid_from: 2026-01-01
+    valid_to: 2027-12-31
+    example_clause_text: "SYNTHETIC: Rent shall increase by 4% on each anniversary of the commencement date."
+    expected_flag: ok
+    expected_explanation_points:
+      - "increase is within the 5% annual cap currently in force"
+      - "cap regime ends 31 Dec 2027; what applies after is not yet known"
+      - "as-of date of this explanation"
+    notes: "Within-cap case. Pair row for the boundary (exactly 5%) belongs in the full dataset."
+  - id: rc-002
+    clause_type: rent-escalation
+    jurisdiction: NS
+    rule_summary: "Same cap rule as rc-001; clause exceeds it."
+    statute_ref: "TO-TRACE (same as rc-001)"
+    source: *nspage
+    valid_from: 2026-01-01
+    valid_to: 2027-12-31
+    example_clause_text: "SYNTHETIC: Rent shall increase by 8% annually at the Landlord's discretion."
+    expected_flag: flag
+    expected_explanation_points:
+      - "8% exceeds the 5% annual cap currently in force"
+      - "explanation states the rule and the gap; no accusation, no advice on action"
+      - "options exist (ask, dispute via Residential Tenancies Program); phrased as options"
+    notes: "Over-cap case. Harmful-failure guard: this row must NEVER score 'ok' (mirror of a36's zero-false-present bar)."
+  - id: lp-001
+    clause_type: late-payment-eviction-timeline
+    jurisdiction: NS
+    rule_summary: "Non-payment: landlord may serve notice 3 days after rent is due; tenant has 10 days to pay in full or dispute; days are calendar days."
+    statute_ref: "TO-TRACE (RTA amendments effective 30 Apr 2025)"
+    source: *nspage
+    valid_from: 2025-04-30
+    valid_to: null
+    example_clause_text: "SYNTHETIC: If rent is not received within five business days of the due date, the Landlord may pursue all remedies available at law."
+    expected_flag: flag
+    expected_explanation_points:
+      - "the statutory timeline (3-day notice / 10-day response) operates regardless of clause wording"
+      - "calendar days, not business days - the clause's 'business days' framing can mislead"
+      - "date-walk explanation pattern (see explainer spec 2)"
+    notes: "The calendar-day redefinition is the trap this row tests."
+  - id: sl-001
+    clause_type: sublet
+    jurisdiction: NS
+    rule_summary: "A subtenant cannot be charged more rent than the landlord charges the tenant."
+    statute_ref: "TO-TRACE (amendments effective 20 Sep 2024)"
+    source: *nspage
+    valid_from: 2024-09-20
+    valid_to: null
+    example_clause_text: "SYNTHETIC: Tenant may sublet with consent; subletting fees and rent premiums are at Tenant's discretion."
+    expected_flag: flag
+    expected_explanation_points:
+      - "sublet rent above the lease rent is not permitted"
+      - "consent mechanics are separate from the rent limit"
+    notes: "Narrow rule; single-entry coverage is sufficient (source report idea 6)."
+  - id: es-001
+    clause_type: notice-service
+    jurisdiction: NS
+    rule_summary: "Documents served by email must be sent from/to the email address recorded in the lease."
+    statute_ref: "TO-TRACE (amendments effective 20 Sep 2024)"
+    source: *nspage
+    valid_from: 2024-09-20
+    valid_to: null
+    example_clause_text: "SYNTHETIC: Notices may be delivered by any electronic means to any address the Landlord deems appropriate."
+    expected_flag: flag
+    expected_explanation_points:
+      - "email service validity depends on the address recorded in the lease"
+      - "why the recorded-address rule protects both parties"
+    notes: "Pairs with the completeness check - the recorded email is one of the contact anchors."
+  - id: cc-001
+    clause_type: completeness-contact-fields
+    jurisdiction: NS
+    rule_summary: "Leases must include landlord name, civic address, mailing address, phone, and agent contacts where applicable (a36 feature)."
+    statute_ref: "TO-TRACE (effective date also to confirm during trace)"
+    source: *nspage
+    valid_from: null
+    valid_to: null
+    example_clause_text: "SYNTHETIC: Landlord: J. Example, 100 Example St, Halifax NS B3H 0A1 (civic and mailing); tel 902-555-0100; agent: Example Property Mgmt, 200 Sample Ave, 902-555-0101."
+    expected_flag: ok
+    expected_explanation_points:
+      - "all five required contact elements present (element-by-element)"
+    notes: "Completeness-positive sample. valid_from null = effective date not stated on the summary page; confirm during trace-to-Act, do not guess."
+  - id: cc-002
+    clause_type: completeness-contact-fields
+    jurisdiction: NS
+    rule_summary: "Same rule as cc-001; required elements missing."
+    statute_ref: "TO-TRACE (same as cc-001)"
+    source: *nspage
+    valid_from: null
+    valid_to: null
+    example_clause_text: "SYNTHETIC: Landlord: J. Example. Rent payable by e-transfer to the address provided at move-in."
+    expected_flag: missing
+    expected_explanation_points:
+      - "civic address, mailing address, phone, agent details not found"
+      - "missing-required-information framing; no accusation"
+      - "option: request the missing information in writing"
+    notes: "Completeness-negative sample. a36's harmful failure: this row must NEVER score 'ok' or 'present'."
+
+gaps_acknowledged:
+  - "7 rows vs the 20-50 target (a11 checklist still pending - reference-dataset checklist will govern the full build)."
+  - "2 completeness rows vs the >=10/>=10 requirement in a36's success criteria."
+  - "No boundary cases yet (exactly-5% increase; notice on day 3 exactly; weekend/holiday date walks)."
+  - "All statute_ref fields are TO-TRACE; nothing here ships before the trace-to-Act pass."
+  - "No real-lease examples; all synthetic. Real anonymized examples are a later, consent-gated step."
