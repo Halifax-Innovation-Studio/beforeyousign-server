@@ -1,13 +1,19 @@
 # === bys-server snapshot provenance ===
 # Source: Signal-Intelligence/product/bys-clause-dataset-seed.yaml
 # Copied: 2026-06-11
-# schema_version: 1
+# schema_version at copy time: 1
 # sha256: 597a37e68383537336aafbcfbe53d51a6724a04c74d3afd694c3234b8ce9cd92
 #   (hash of the SI source file at copy time; provenance only — it does NOT
 #    mean the dataset is legally correct or complete)
 # status: seed-incomplete
 # Signal Intelligence remains the evidence/productization source; update this
 # snapshot by re-copying and re-hashing, not by editing rows here.
+# --- migration log ---
+# 2026-06-11 (T9A): migrated to schema_version 2 per the approved plan
+#   Signal-Intelligence/product/bys-t9-statute-trace-plan.md §5 — added
+#   trace_status / confidence / trace_sources / traced_date per row.
+#   Rule content unchanged; every row remains trace_status: placeholder and
+#   every statute_ref remains TO-TRACE. No statute tracing performed yet.
 # =======================================
 # BYS reference clause dataset — SEED (a37)
 # Status: SEED ONLY — 7 sample rows demonstrating structure. This dataset is
@@ -29,7 +35,7 @@
 # content/ns-tenancy-dates-calendar.md - calendar and dataset update together).
 
 dataset_version: 0.1-seed
-schema_version: 1
+schema_version: 2
 created: 2026-06-10
 status: seed-incomplete
 row_count: 7
@@ -53,6 +59,10 @@ fields_doc:
   expected_flag: "what BYS v-next should surface (ok | flag | missing | out-of-scope)"
   expected_explanation_points: "what a correct explanation must cover"
   notes: "row-level caveats"
+  trace_status: "placeholder | partial | traced | unresolved - authoritative trace state (T9 plan §5)"
+  confidence: "high | medium | low - required when trace_status != placeholder; null for placeholder"
+  trace_sources: "trace evidence records (source_type statute | regulation | amending-act | program-page | form-guide | locator); empty for placeholder"
+  traced_date: "date of the trace pass (YYYY-MM-DD); null for placeholder"
 
 rows:
   - id: rc-001
@@ -70,6 +80,10 @@ rows:
       - "cap regime ends 31 Dec 2027; what applies after is not yet known"
       - "as-of date of this explanation"
     notes: "Within-cap case. Pair row for the boundary (exactly 5%) belongs in the full dataset."
+    trace_status: placeholder
+    confidence: null
+    trace_sources: []
+    traced_date: null
   - id: rc-002
     clause_type: rent-escalation
     jurisdiction: NS
@@ -85,6 +99,10 @@ rows:
       - "explanation states the rule and the gap; no accusation, no advice on action"
       - "options exist (ask, dispute via Residential Tenancies Program); phrased as options"
     notes: "Over-cap case. Harmful-failure guard: this row must NEVER score 'ok' (mirror of a36's zero-false-present bar)."
+    trace_status: placeholder
+    confidence: null
+    trace_sources: []
+    traced_date: null
   - id: lp-001
     clause_type: late-payment-eviction-timeline
     jurisdiction: NS
@@ -100,6 +118,10 @@ rows:
       - "calendar days, not business days - the clause's 'business days' framing can mislead"
       - "date-walk explanation pattern (see explainer spec 2)"
     notes: "The calendar-day redefinition is the trap this row tests."
+    trace_status: placeholder
+    confidence: null
+    trace_sources: []
+    traced_date: null
   - id: sl-001
     clause_type: sublet
     jurisdiction: NS
@@ -114,6 +136,10 @@ rows:
       - "sublet rent above the lease rent is not permitted"
       - "consent mechanics are separate from the rent limit"
     notes: "Narrow rule; single-entry coverage is sufficient (source report idea 6)."
+    trace_status: placeholder
+    confidence: null
+    trace_sources: []
+    traced_date: null
   - id: es-001
     clause_type: notice-service
     jurisdiction: NS
@@ -128,6 +154,10 @@ rows:
       - "email service validity depends on the address recorded in the lease"
       - "why the recorded-address rule protects both parties"
     notes: "Pairs with the completeness check - the recorded email is one of the contact anchors."
+    trace_status: placeholder
+    confidence: null
+    trace_sources: []
+    traced_date: null
   - id: cc-001
     clause_type: completeness-contact-fields
     jurisdiction: NS
@@ -141,6 +171,10 @@ rows:
     expected_explanation_points:
       - "all five required contact elements present (element-by-element)"
     notes: "Completeness-positive sample. valid_from null = effective date not stated on the summary page; confirm during trace-to-Act, do not guess."
+    trace_status: placeholder
+    confidence: null
+    trace_sources: []
+    traced_date: null
   - id: cc-002
     clause_type: completeness-contact-fields
     jurisdiction: NS
@@ -156,6 +190,10 @@ rows:
       - "missing-required-information framing; no accusation"
       - "option: request the missing information in writing"
     notes: "Completeness-negative sample. a36's harmful failure: this row must NEVER score 'ok' or 'present'."
+    trace_status: placeholder
+    confidence: null
+    trace_sources: []
+    traced_date: null
 
 gaps_acknowledged:
   - "7 rows vs the 20-50 target (a11 checklist still pending - reference-dataset checklist will govern the full build)."
