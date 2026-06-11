@@ -6,14 +6,24 @@
 #   (hash of the SI source file at copy time; provenance only — it does NOT
 #    mean the dataset is legally correct or complete)
 # status: seed-incomplete
-# Signal Intelligence remains the evidence/productization source; update this
-# snapshot by re-copying and re-hashing, not by editing rows here.
+# As of T9B, this file is the canonical bys-server clause dataset. It
+# originated as a copied snapshot of
+# Signal-Intelligence/product/bys-clause-dataset-seed.yaml, but traced rows now
+# diverge from that seed under the approved T9 trace plan. Do not re-copy over
+# traced rows. Future edits must follow the T9 trace protocol
+# (Signal-Intelligence/product/bys-t9-statute-trace-plan.md) and loader
+# validation.
 # --- migration log ---
 # 2026-06-11 (T9A): migrated to schema_version 2 per the approved plan
 #   Signal-Intelligence/product/bys-t9-statute-trace-plan.md §5 — added
 #   trace_status / confidence / trace_sources / traced_date per row.
 #   Rule content unchanged; every row remains trace_status: placeholder and
 #   every statute_ref remains TO-TRACE. No statute tracing performed yet.
+# 2026-06-11 (T9B): sl-001 traced against official sources (RTA s. 9B(6);
+#   S.N.S. 2024, c. 12, s. 9) under the T9 trace plan — calibration row.
+#   Dataset now diverges from the original SI seed for traced rows. The
+#   remaining 6 rows stay placeholder / TO-TRACE. Dataset remains
+#   seed-incomplete; traced does not mean validated or legally advised.
 # =======================================
 # BYS reference clause dataset — SEED (a37)
 # Status: SEED ONLY — 7 sample rows demonstrating structure. This dataset is
@@ -125,8 +135,8 @@ rows:
   - id: sl-001
     clause_type: sublet
     jurisdiction: NS
-    rule_summary: "A subtenant cannot be charged more rent than the landlord charges the tenant."
-    statute_ref: "TO-TRACE (amendments effective 20 Sep 2024)"
+    rule_summary: "For sublet agreements entered into on or after 20 Sep 2024, the tenant who sublets cannot charge the subtenant more rent than the landlord lawfully charges the tenant."
+    statute_ref: "Residential Tenancies Act, R.S.N.S. 1989, c. 401, s. 9B(6) (added by S.N.S. 2024, c. 12, s. 9)"
     source: *nspage
     valid_from: 2024-09-20
     valid_to: null
@@ -135,11 +145,27 @@ rows:
     expected_explanation_points:
       - "sublet rent above the lease rent is not permitted"
       - "consent mechanics are separate from the rent limit"
-    notes: "Narrow rule; single-entry coverage is sufficient (source report idea 6)."
-    trace_status: placeholder
-    confidence: null
-    trace_sources: []
-    traced_date: null
+    notes: "Narrow rule; single-entry coverage is sufficient (source report idea 6). Traced 2026-06-11 (T9B calibration). The statutory trigger is the date the sublet agreement is entered into (on/after 2024-09-20), not the evaluation date - valid_from approximates this; do not treat the row as covering sublet agreements made before 2024-09-20. rule_summary rewritten at trace time per plan §2 step 8 (statutory actor + 'lawfully charged' + transitional condition); seed wording was: 'A subtenant cannot be charged more rent than the landlord charges the tenant.'"
+    trace_status: traced
+    confidence: high
+    trace_sources:
+      - source_type: statute
+        title: "Residential Tenancies Act, R.S.N.S. 1989, c. 401 (official consolidation to October 3, 2025)"
+        url: "https://nslegislature.ca/sites/default/files/legc/statutes/residential%20tenancies.pdf"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "s. 9B(6)"
+        quote_or_summary: "Where a sublet agreement is entered into on or after the coming into force of this subsection, the tenant who sublets the residential premises shall not charge the subtenant a rent amount higher than the rent amount being lawfully charged by the landlord to the tenant."
+        notes: "History line: 2018, c. 41, s. 6; 2024, c. 12, s. 9. Title page confirms the consolidation incorporates 2024, c. 12, ss. 3-24; no unproclaimed-provision note attaches to s. 9B(6) (the consolidation flags unproclaimed provisions elsewhere, e.g. s. 12(9)-(12))."
+      - source_type: amending-act
+        title: "Bill 467 (as passed) - Interim Residential Rental Increase Cap Act (amended) and Residential Tenancies Act (amended), Chapter 12 of the Acts of 2024"
+        url: "https://nslegislature.ca/legc/bills/64th_1st/3rd_read/b467.htm"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "s. 9 (adds RTA s. 9B(6)); s. 28 (commencement)"
+        quote_or_summary: "s. 28: 'Sections 1 and 2, 4 to 8 and 10 to 23 come into force on such day as the Governor in Council orders and declares by proclamation.' Section 9 is excluded from the proclamation clause, so it came into force on Royal Assent; the official bill page records 'Royal Assent: September 20, 2024'."
+        notes: "Effective-date authority for valid_from 2024-09-20. Royal-assent commencement for provisions omitted from the proclamation clause follows the default commencement rule; corroborated by the consolidation showing s. 9B(6) in force with no unproclaimed note."
+    traced_date: 2026-06-11
   - id: es-001
     clause_type: notice-service
     jurisdiction: NS
@@ -199,5 +225,5 @@ gaps_acknowledged:
   - "7 rows vs the 20-50 target (a11 checklist still pending - reference-dataset checklist will govern the full build)."
   - "2 completeness rows vs the >=10/>=10 requirement in a36's success criteria."
   - "No boundary cases yet (exactly-5% increase; notice on day 3 exactly; weekend/holiday date walks)."
-  - "All statute_ref fields are TO-TRACE; nothing here ships before the trace-to-Act pass."
+  - "6 of 7 statute_ref fields remain TO-TRACE (sl-001 traced 2026-06-11 as the T9B calibration row); no untraced row ships before its trace-to-Act pass."
   - "No real-lease examples; all synthetic. Real anonymized examples are a later, consent-gated step."
