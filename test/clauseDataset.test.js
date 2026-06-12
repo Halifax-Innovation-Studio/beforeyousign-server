@@ -14,8 +14,9 @@ const {
 
 const SEED_ROW_IDS = ['rc-001', 'rc-002', 'lp-001', 'sl-001', 'es-001', 'cc-001', 'cc-002'];
 // T9B traced the calibration row sl-001; T9C traced es-001; T9D traced the
-// rent-cap pair rc-001/rc-002. The rest remain placeholders.
-const SEED_TRACED_IDS = ['sl-001', 'es-001', 'rc-001', 'rc-002'];
+// rent-cap pair rc-001/rc-002; T9E traced lp-001. cc-001/cc-002 remain
+// placeholders.
+const SEED_TRACED_IDS = ['sl-001', 'es-001', 'rc-001', 'rc-002', 'lp-001'];
 const SEED_PLACEHOLDER_IDS = SEED_ROW_IDS.filter((id) => !SEED_TRACED_IDS.includes(id));
 
 function makeStatuteSource(overrides = {}) {
@@ -162,6 +163,37 @@ test('seed rent-cap pair rc-001/rc-002 carries a complete official trace with co
   assert.deepEqual(rcIds(getApplicableRules(loaded.rows, '2028-01-01')), [], '2028-01-01 out-of-window');
   assert.deepEqual(rcIds(getApplicableRules(loaded.rows, '2024-01-01')), ['rc-001', 'rc-002'], 'valid_from boundary in-window');
   assert.deepEqual(rcIds(getApplicableRules(loaded.rows, '2023-12-31')), [], 'day before valid_from out-of-window');
+});
+
+test('seed lp-001 row carries a complete official trace', () => {
+  const loaded = loadClauseDataset({ mode: 'eval' });
+  const row = loaded.rows.find((r) => r.id === 'lp-001');
+  assert.ok(row, 'lp-001 must exist');
+  assert.equal(row.trace_status, 'traced');
+  assert.equal(row.confidence, 'high');
+  assert.ok(!row.statute_ref.startsWith('TO-TRACE'));
+  assert.ok(
+    row.statute_ref.includes('10(6)') && row.statute_ref.includes('2(aa)'),
+    'statute_ref must pinpoint the arrears timeline and the calendar-day definition'
+  );
+  assert.equal(row.valid_from, '2025-04-30', 'valid_from is the proclamation date of the 3/10 timeline');
+  assert.equal(row.valid_to, null);
+  assert.equal(row.traced_date, '2026-06-11');
+  assert.equal(row.expected_flag, 'flag', 'business-days clause stays a flag case');
+  assert.ok(row.isTraced);
+  assert.ok(
+    row.trace_sources.some((s) => ['statute', 'regulation', 'amending-act'].includes(s.source_type)),
+    'lp-001 must carry at least one official trace authority'
+  );
+  assert.ok(/calendar day/i.test(row.rule_summary), 'calendar-day rule stays in the summary');
+  assert.ok(
+    /pre-2025 regime|week-to-week/i.test(row.notes),
+    'row notes must preserve the pre-2025 and week-to-week limitations'
+  );
+  assert.ok(
+    row.expected_explanation_points.some((p) => /not an eviction/i.test(p)),
+    'explanation points must distinguish notice to quit from eviction'
+  );
 });
 
 test('seed sl-001 row carries a complete official trace', () => {

@@ -37,6 +37,13 @@
 #   ruling (5% applies to increases from 2024-01-01); valid_to 2027-12-31
 #   supported (Act s. 7(1) expiry). The remaining 3 rows stay placeholder /
 #   TO-TRACE. Dataset remains seed-incomplete.
+# 2026-06-11 (T9E): lp-001 traced against official late-payment /
+#   notice-to-quit sources (RTA ss. 10(6)-(6E) as amended by S.N.S. 2024,
+#   c. 12, s. 10, proclaimed 2025-04-30; s. 2(aa) calendar-day definition
+#   added by s. 3, in force 2024-09-20). valid_from 2025-04-30 retained;
+#   rule_summary rewritten for precision (threshold day 3 / service from
+#   day 4 / 10-day windows; response runs from receipt). The remaining 2 rows
+#   stay placeholder / TO-TRACE. Dataset remains seed-incomplete.
 # =======================================
 # BYS reference clause dataset — SEED (a37)
 # Status: SEED ONLY — 7 sample rows demonstrating structure. This dataset is
@@ -178,22 +185,47 @@ rows:
   - id: lp-001
     clause_type: late-payment-eviction-timeline
     jurisdiction: NS
-    rule_summary: "Non-payment: landlord may serve notice 3 days after rent is due; tenant has 10 days to pay in full or dispute; days are calendar days."
-    statute_ref: "TO-TRACE (RTA amendments effective 30 Apr 2025)"
+    rule_summary: "Non-payment (fixed-term, year-to-year or month-to-month tenancies): if rent is unpaid on or before the third day after it was due, the landlord may give a notice to quit on or after the fourth day, effective not earlier than the tenth day after it is given; within ten days of receiving the notice the tenant may pay the arrears (voiding the notice) or apply to the Director to set it aside; 'day' means a calendar day."
+    statute_ref: "Residential Tenancies Act, R.S.N.S. 1989, c. 401, ss. 10(6)-(6E) (timeline as amended by S.N.S. 2024, c. 12, s. 10) and s. 2(aa) (added by S.N.S. 2024, c. 12, s. 3)"
     source: *nspage
     valid_from: 2025-04-30
     valid_to: null
     example_clause_text: "SYNTHETIC: If rent is not received within five business days of the due date, the Landlord may pursue all remedies available at law."
     expected_flag: flag
     expected_explanation_points:
-      - "the statutory timeline (3-day notice / 10-day response) operates regardless of clause wording"
-      - "calendar days, not business days - the clause's 'business days' framing can mislead"
+      - "the statutory timeline (notice on/after the 4th day after rent was due, effective no earlier than the 10th day after it is given; 10 days from receipt to pay the arrears or apply to the Director) operates regardless of clause wording"
+      - "calendar days, not business days - RTA s. 2(aa) defines 'day' as a calendar day; the clause's 'business days' framing can mislead"
+      - "a notice to quit is not an eviction - termination is deemed accepted only if the tenant neither pays the arrears nor applies to the Director within the window"
       - "date-walk explanation pattern (see explainer spec 2)"
-    notes: "The calendar-day redefinition is the trap this row tests."
-    trace_status: placeholder
-    confidence: null
-    trace_sources: []
-    traced_date: null
+    notes: "The calendar-day redefinition is the trap this row tests. Traced 2026-06-11 (T9E). valid_from 2025-04-30 retained: the current 3/10 timeline comes from S.N.S. 2024, c. 12, s. 10, proclaimed in force 2025-04-30; the s. 2(aa) calendar-day definition (2024, c. 12, s. 3) was in force earlier, from Royal Assent 2024-09-20. NOT modeled: the pre-2025 regime (15-day threshold/periods, replaced by bill s. 10), week-to-week tenancies (different regime in s. 10(7): unpaid through day 7 / notice from day 8 / 7-day effective period), and service/deemed-receipt mechanics (s. 15) that determine when the 10-day response window starts. s. 10(5): the notice must be in the form required by the Director (form reflects, not creates, the timeline). Seed rule_summary was: 'Non-payment: landlord may serve notice 3 days after rent is due; tenant has 10 days to pay in full or dispute; days are calendar days.'"
+    trace_status: traced
+    confidence: high
+    trace_sources:
+      - source_type: statute
+        title: "Residential Tenancies Act, R.S.N.S. 1989, c. 401 (official consolidation to October 3, 2025)"
+        url: "https://nslegislature.ca/sites/default/files/legc/statutes/residential%20tenancies.pdf"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "ss. 2(aa), 10(6), 10(6A)-(6E); see also ss. 10(5), 10(7)"
+        quote_or_summary: "s. 2(aa): \"'day' means a calendar day\". s. 10(6): 'Where a fixed-term lease exists or where a year to year or a month to month tenancy exists or is deemed to exist and the rent payable for the residential premises is not paid by the tenant on or before the third day after the rent was due, then on any day on or after the fourth day after the rent was due the landlord may give to the tenant notice to quit the residential premises effective not earlier than the tenth day after the date the notice to quit is given to the tenant.' s. 10(6A): 'Not later than ten days after receiving a notice to quit under subsection (6), the tenant may (a) pay to the landlord the rent that is in arrears, and upon the payment of that rent, the notice to quit is void and of no effect; or (b) apply to the Director under Section 13 for an order setting aside the notice to quit.'"
+        notes: "s. 10 history line ends 2024, c. 12, s. 10 (2025, c. 19 did not amend s. 10). s. 10(6C): deemed acceptance and vacate-by-effective-date only where the tenant neither pays nor applies. s. 10(7): week-to-week tenancies have a different (7/8/7) regime."
+      - source_type: amending-act
+        title: "Bill 467 (as passed) - Interim Residential Rental Increase Cap Act (amended) and Residential Tenancies Act (amended), Chapter 12 of the Acts of 2024"
+        url: "https://nslegislature.ca/legc/bills/64th_1st/3rd_read/b467.htm"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "s. 3 (adds RTA s. 2(aa)); s. 10(2)-(4) (15-day regime -> 3/10 timeline); s. 28 (commencement)"
+        quote_or_summary: "s. 10(2) amends s. 10(6) by 'striking out \"fifteenth day after the rent is due, on or after the sixteenth day the rent is\" and substituting \"third day after the rent was due, then on any day on or after the fourth day after the rent was\"' and substituting 'tenth' for the second 'fifteenth'; s. 10(3)-(4) substitute 'ten' for 'fifteen' in ss. 10(6A) and 10(6D). s. 3 adds: '(aa) \"day\" means a calendar day;'. s. 28 puts ss. 10-23 (incl. bill s. 10) on proclamation; bill s. 3 is excluded, so the calendar-day definition commenced at Royal Assent (2024-09-20)."
+        notes: "Documents the before->after of the timeline (15-day regime replaced) and the split commencement: calendar-day definition 2024-09-20; new timeline by proclamation."
+      - source_type: locator
+        title: "Proclamations of Nova Scotia Statutes (Office of the Legislative Counsel proclamation record)"
+        url: "https://nslegislature.ca/legislation/proclamations-nova-scotia-statutes"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "entry for Residential Tenancies Act (R.S. 1989, c. 401)"
+        quote_or_summary: "'amended 2024, c. 12, ss. 4-8, 10-23 -- April 30, 2025' - in-force authority for the current s. 10(6)-(6E) timeline and the row's valid_from."
+        notes: "Royal Gazette Part II instrument not separately pulled (no proclamation applies to bill s. 3; the s. 10 proclamation date is from the official OLC record) - noted per approval-record ruling 5."
+    traced_date: 2026-06-11
   - id: sl-001
     clause_type: sublet
     jurisdiction: NS
@@ -312,5 +344,5 @@ gaps_acknowledged:
   - "7 rows vs the 20-50 target (a11 checklist still pending - reference-dataset checklist will govern the full build)."
   - "2 completeness rows vs the >=10/>=10 requirement in a36's success criteria."
   - "No boundary cases yet (exactly-5% increase; notice on day 3 exactly; weekend/holiday date walks)."
-  - "3 of 7 statute_ref fields remain TO-TRACE (sl-001, es-001, rc-001 and rc-002 traced 2026-06-11 under the T9 trace plan); no untraced row ships before its trace-to-Act pass."
+  - "2 of 7 statute_ref fields remain TO-TRACE (sl-001, es-001, rc-001, rc-002 and lp-001 traced 2026-06-11 under the T9 trace plan); no untraced row ships before its trace-to-Act pass."
   - "No real-lease examples; all synthetic. Real anonymized examples are a later, consent-gated step."
