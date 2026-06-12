@@ -13,8 +13,9 @@ const {
 } = require('../lib/clauseDataset');
 
 const SEED_ROW_IDS = ['rc-001', 'rc-002', 'lp-001', 'sl-001', 'es-001', 'cc-001', 'cc-002'];
-// T9B traced the calibration row sl-001; the rest remain placeholders.
-const SEED_TRACED_IDS = ['sl-001'];
+// T9B traced the calibration row sl-001; T9C traced es-001.
+// The rest remain placeholders.
+const SEED_TRACED_IDS = ['sl-001', 'es-001'];
 const SEED_PLACEHOLDER_IDS = SEED_ROW_IDS.filter((id) => !SEED_TRACED_IDS.includes(id));
 
 function makeStatuteSource(overrides = {}) {
@@ -105,6 +106,29 @@ test('seed snapshot loads in dev mode: sl-001 traced, 6 placeholder rows, warnin
   }
 });
 
+test('seed es-001 row carries a complete official trace with corrected window', () => {
+  const loaded = loadClauseDataset({ mode: 'eval' });
+  const row = loaded.rows.find((r) => r.id === 'es-001');
+  assert.ok(row, 'es-001 must exist');
+  assert.equal(row.trace_status, 'traced');
+  assert.equal(row.confidence, 'high');
+  assert.ok(!row.statute_ref.startsWith('TO-TRACE'));
+  assert.ok(row.statute_ref.includes('15(1)(e)') && row.statute_ref.includes('15(2)(e)'), 'statute_ref must pinpoint RTA s. 15 service clauses');
+  assert.equal(row.valid_from, '2025-04-30', 'valid_from must be the proclamation date, not the 2024 royal-assent date');
+  assert.equal(row.valid_to, null);
+  assert.equal(row.traced_date, '2026-06-11');
+  assert.ok(Array.isArray(row.trace_sources) && row.trace_sources.length >= 2);
+  assert.ok(
+    row.trace_sources.some((s) => ['statute', 'regulation', 'amending-act'].includes(s.source_type)),
+    'es-001 must carry at least one official trace authority'
+  );
+  assert.ok(row.isTraced, 'derived isTraced must be true');
+  assert.ok(
+    /prior, different electronic-service regime|NOT modeled/i.test(row.notes),
+    'row notes must preserve the pre-2025 regime limitation'
+  );
+});
+
 test('seed sl-001 row carries a complete official trace', () => {
   const loaded = loadClauseDataset({ mode: 'eval' });
   const row = loaded.rows.find((r) => r.id === 'sl-001');
@@ -128,16 +152,18 @@ test('seed snapshot loads in eval mode', () => {
   assert.equal(loaded.rows.length, 7);
 });
 
-// 3. Seed still fails in shipping mode: the 6 untraced rows are named,
-// the traced calibration row sl-001 is not.
-test('seed snapshot is refused in shipping mode, naming the 6 untraced rows but not sl-001', () => {
+// 3. Seed still fails in shipping mode: the untraced rows are named,
+// the traced rows are not.
+test('seed snapshot is refused in shipping mode, naming untraced rows but no traced row', () => {
   assert.throws(
     () => loadClauseDataset({ mode: 'shipping' }),
     (err) => {
       for (const id of SEED_PLACEHOLDER_IDS) {
         assert.ok(err.message.includes(id), `error should name ${id}`);
       }
-      assert.ok(!err.message.includes('sl-001'), 'sl-001 is traced and must not be named');
+      for (const id of SEED_TRACED_IDS) {
+        assert.ok(!err.message.includes(id), `${id} is traced and must not be named`);
+      }
       return true;
     }
   );

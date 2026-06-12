@@ -24,6 +24,12 @@
 #   Dataset now diverges from the original SI seed for traced rows. The
 #   remaining 6 rows stay placeholder / TO-TRACE. Dataset remains
 #   seed-incomplete; traced does not mean validated or legally advised.
+# 2026-06-11 (T9C): es-001 traced against official sources (RTA ss. 15(1)(e),
+#   15(2)(e) substituted by S.N.S. 2024, c. 12, s. 21; ss. 7B-7C added by
+#   s. 5) under the T9 trace plan. valid_from corrected 2024-09-20 ->
+#   2025-04-30 (proclamation date for 2024, c. 12, ss. 4-8, 10-23); seed
+#   rule_summary rewritten/narrowed. The remaining 5 rows stay placeholder /
+#   TO-TRACE. Dataset remains seed-incomplete.
 # =======================================
 # BYS reference clause dataset — SEED (a37)
 # Status: SEED ONLY — 7 sample rows demonstrating structure. This dataset is
@@ -169,21 +175,46 @@ rows:
   - id: es-001
     clause_type: notice-service
     jurisdiction: NS
-    rule_summary: "Documents served by email must be sent from/to the email address recorded in the lease."
-    statute_ref: "TO-TRACE (amendments effective 20 Sep 2024)"
+    rule_summary: "For documents served electronically under the Residential Tenancies Act (other than Director-application and Small Claims Court appeal documents), service must be sent to the other party's most-recently provided electronic address - in the lease or as changed under s. 7C - and from the sender's own most-recently provided electronic address."
+    statute_ref: "Residential Tenancies Act, R.S.N.S. 1989, c. 401, ss. 15(1)(e) and 15(2)(e) (substituted by S.N.S. 2024, c. 12, s. 21; related ss. 7B-7C added by S.N.S. 2024, c. 12, s. 5)"
     source: *nspage
-    valid_from: 2024-09-20
+    valid_from: 2025-04-30
     valid_to: null
     example_clause_text: "SYNTHETIC: Notices may be delivered by any electronic means to any address the Landlord deems appropriate."
     expected_flag: flag
     expected_explanation_points:
-      - "email service validity depends on the address recorded in the lease"
+      - "electronic service validity depends on the most-recently provided electronic address (in the lease or updated under RTA s. 7C), not any address a party picks"
+      - "both directions are regulated: sent to the recipient's recorded address and from the sender's own recorded address"
       - "why the recorded-address rule protects both parties"
-    notes: "Pairs with the completeness check - the recorded email is one of the contact anchors."
-    trace_status: placeholder
-    confidence: null
-    trace_sources: []
-    traced_date: null
+    notes: "Pairs with the completeness check - the recorded email is one of the contact anchors. Traced 2026-06-11 (T9C). valid_from corrected 2024-09-20 -> 2025-04-30: the seed date was the Royal Assent date of S.N.S. 2024, c. 12, but bill ss. 5 and 21 commenced by proclamation on 2025-04-30 (OLC proclamation record). A prior, different electronic-service regime existed from 2023-02-03 (2021, c. 36, s. 13); it was not traced in this pass and is NOT modeled by this row. rule_summary rewritten at trace time per plan §2 step 8; seed wording was: 'Documents served by email must be sent from/to the email address recorded in the lease.' (supported in substance; narrowed: 'electronic address', most-recently-provided incl. s. 7C updates, and the s. 13 / Small Claims carve-out)."
+    trace_status: traced
+    confidence: high
+    trace_sources:
+      - source_type: statute
+        title: "Residential Tenancies Act, R.S.N.S. 1989, c. 401 (official consolidation to October 3, 2025)"
+        url: "https://nslegislature.ca/sites/default/files/legc/statutes/residential%20tenancies.pdf"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "ss. 15(1)(e), 15(2)(e); see also ss. 7B-7C"
+        quote_or_summary: "s. 15(2)(e): 'sending it electronically if ... (iii) the tenant has provided, in the lease or in accordance with Section 7C, an electronic address for the tenant to receive documents, (iv) it is sent to the most-recently provided electronic address referred to in subclause (iii), and (v) it is sent by the landlord from the most-recently provided electronic address for the landlord to receive documents that was provided by the landlord in the lease or in accordance with Section 7C.' s. 15(1)(e) is the mirror rule for tenant-on-landlord service."
+        notes: "s. 15 history line: 2018, c. 41, s. 13; 2021, c. 36, s. 13; 2024, c. 12, s. 21 (2025, c. 19 did not amend s. 15). s. 15 chapeau excepts documents relating to s. 13 Director applications and Small Claims Court appeals. ss. 7B-7C history line: 2024, c. 12, s. 5."
+      - source_type: amending-act
+        title: "Bill 467 (as passed) - Interim Residential Rental Increase Cap Act (amended) and Residential Tenancies Act (amended), Chapter 12 of the Acts of 2024"
+        url: "https://nslegislature.ca/legc/bills/64th_1st/3rd_read/b467.htm"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "s. 5 (adds RTA ss. 7A-7C); s. 21 (substitutes RTA s. 15 electronic-service clauses); s. 28 (commencement)"
+        quote_or_summary: "s. 28: 'Sections 1 and 2, 4 to 8 and 10 to 23 come into force on such day as the Governor in Council orders and declares by proclamation.' Bill ss. 5 and 21 are inside the proclamation list, so these provisions did not commence at Royal Assent (2024-09-20)."
+        notes: "Establishes that the seed's 2024-09-20 date cannot be the effective date for this row; the in-force date is the proclamation date (see proclamation-record source)."
+      - source_type: locator
+        title: "Proclamations of Nova Scotia Statutes (Office of the Legislative Counsel proclamation record)"
+        url: "https://nslegislature.ca/legislation/proclamations-nova-scotia-statutes"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "entry for Residential Tenancies Act (R.S. 1989, c. 401)"
+        quote_or_summary: "'amended 2024, c. 12, ss. 4-8, 10-23 -- April 30, 2025' - the in-force date authority for valid_from 2025-04-30."
+        notes: "Official legislature publication used as the proclamation record; the Royal Gazette Part II instrument was not separately pulled (per approval-record ruling 5 the Gazette remains the primary record - noted, not blocking). Same entry dates the prior regime: 2021, c. 36, s. 13 in force 2023-02-03."
+    traced_date: 2026-06-11
   - id: cc-001
     clause_type: completeness-contact-fields
     jurisdiction: NS
@@ -225,5 +256,5 @@ gaps_acknowledged:
   - "7 rows vs the 20-50 target (a11 checklist still pending - reference-dataset checklist will govern the full build)."
   - "2 completeness rows vs the >=10/>=10 requirement in a36's success criteria."
   - "No boundary cases yet (exactly-5% increase; notice on day 3 exactly; weekend/holiday date walks)."
-  - "6 of 7 statute_ref fields remain TO-TRACE (sl-001 traced 2026-06-11 as the T9B calibration row); no untraced row ships before its trace-to-Act pass."
+  - "5 of 7 statute_ref fields remain TO-TRACE (sl-001 and es-001 traced 2026-06-11 under the T9 trace plan); no untraced row ships before its trace-to-Act pass."
   - "No real-lease examples; all synthetic. Real anonymized examples are a later, consent-gated step."
