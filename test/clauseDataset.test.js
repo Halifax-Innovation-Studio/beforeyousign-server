@@ -13,10 +13,11 @@ const {
 } = require('../lib/clauseDataset');
 
 const SEED_ROW_IDS = ['rc-001', 'rc-002', 'lp-001', 'sl-001', 'es-001', 'cc-001', 'cc-002'];
-// T9B traced the calibration row sl-001; T9C traced es-001; T9D traced the
-// rent-cap pair rc-001/rc-002; T9E traced lp-001. cc-001/cc-002 remain
-// placeholders.
-const SEED_TRACED_IDS = ['sl-001', 'es-001', 'rc-001', 'rc-002', 'lp-001'];
+// T9B-T9F traced all 7 seed rows (sl-001, es-001, rc-001/rc-002, lp-001,
+// cc-001/cc-002). Traced means verified against official text as of the
+// traced_date - the dataset remains seed-incomplete (7 synthetic rows vs the
+// 20-50 target) and shipping-mode loadability is not a readiness claim.
+const SEED_TRACED_IDS = [...SEED_ROW_IDS];
 const SEED_PLACEHOLDER_IDS = SEED_ROW_IDS.filter((id) => !SEED_TRACED_IDS.includes(id));
 
 function makeStatuteSource(overrides = {}) {
@@ -88,12 +89,12 @@ function errorsOf(dataset, mode = 'dev') {
 // --- seed dataset (the committed snapshot) ---
 
 // 1–2. Current seed loads in dev and eval mode.
-test('seed snapshot loads in dev mode: sl-001 traced, 6 placeholder rows, warnings present', () => {
+test('seed snapshot loads in dev mode: all 7 rows traced, no warnings', () => {
   const loaded = loadClauseDataset({ mode: 'dev' });
   assert.equal(loaded.meta.schemaVersion, 2);
   assert.equal(loaded.meta.rowCount, 7);
   assert.equal(loaded.rows.length, 7);
-  assert.ok(loaded.warnings.length > 0, 'untraced seed rows must surface as warnings');
+  assert.deepEqual(loaded.warnings, [], 'no untraced rows remain, so no warnings expected');
   const byId = Object.fromEntries(loaded.rows.map((r) => [r.id, r]));
   for (const id of SEED_PLACEHOLDER_IDS) {
     assert.equal(byId[id].trace_status, 'placeholder', `${id} must remain placeholder`);
@@ -196,6 +197,42 @@ test('seed lp-001 row carries a complete official trace', () => {
   );
 });
 
+test('seed completeness pair cc-001/cc-002 carries a complete official trace with corrected window', () => {
+  const loaded = loadClauseDataset({ mode: 'eval' });
+  const byId = Object.fromEntries(loaded.rows.map((r) => [r.id, r]));
+  for (const id of ['cc-001', 'cc-002']) {
+    const row = byId[id];
+    assert.ok(row, `${id} must exist`);
+    assert.equal(row.trace_status, 'traced');
+    assert.equal(row.confidence, 'high');
+    assert.ok(!row.statute_ref.startsWith('TO-TRACE'));
+    assert.ok(row.statute_ref.includes('7A'), `${id} statute_ref must pinpoint RTA s. 7A`);
+    assert.equal(row.valid_from, '2025-04-30', `${id} valid_from must be the proclamation date (was null in the seed)`);
+    assert.equal(row.valid_to, null);
+    assert.equal(row.traced_date, '2026-06-11');
+    assert.ok(row.isTraced);
+    assert.ok(
+      row.trace_sources.some((s) => ['statute', 'regulation', 'amending-act'].includes(s.source_type)),
+      `${id} must carry at least one official trace authority`
+    );
+  }
+  assert.equal(byId['cc-001'].expected_flag, 'ok', 'cc-001 completeness-positive case stays ok');
+  assert.equal(byId['cc-002'].expected_flag, 'missing', 'cc-002 completeness-negative case stays missing');
+  assert.ok(/NEVER score 'ok' or 'present'/.test(byId['cc-002'].notes), 'cc-002 harmful-failure guard note must survive');
+  assert.ok(
+    /property manager|superintendent/i.test(byId['cc-001'].rule_summary),
+    'cc-001 rule_summary must reflect the expanded statutory element set'
+  );
+  assert.ok(
+    byId['cc-002'].expected_explanation_points.some((p) => /only if such a person exists/i.test(p)),
+    'cc-002 must not treat conditional persons as unconditionally required'
+  );
+  assert.ok(
+    /transitional|written notice/i.test(byId['cc-001'].notes) && /not a legal-noncompliance conclusion|transitional/i.test(byId['cc-002'].expected_explanation_points.join(' ')),
+    'the s. 7A(3) transitional-notice nuance must be preserved'
+  );
+});
+
 test('seed sl-001 row carries a complete official trace', () => {
   const loaded = loadClauseDataset({ mode: 'eval' });
   const row = loaded.rows.find((r) => r.id === 'sl-001');
@@ -219,21 +256,15 @@ test('seed snapshot loads in eval mode', () => {
   assert.equal(loaded.rows.length, 7);
 });
 
-// 3. Seed still fails in shipping mode: the untraced rows are named,
-// the traced rows are not.
-test('seed snapshot is refused in shipping mode, naming untraced rows but no traced row', () => {
-  assert.throws(
-    () => loadClauseDataset({ mode: 'shipping' }),
-    (err) => {
-      for (const id of SEED_PLACEHOLDER_IDS) {
-        assert.ok(err.message.includes(id), `error should name ${id}`);
-      }
-      for (const id of SEED_TRACED_IDS) {
-        assert.ok(!err.message.includes(id), `${id} is traced and must not be named`);
-      }
-      return true;
-    }
-  );
+// 3. With all 7 seed rows traced, shipping mode now loads. This closes the
+// trace gate for the current seed rows ONLY - it is not a completeness,
+// validation, or production-readiness claim (dataset is 7 synthetic rows vs
+// the 20-50 target).
+test('seed snapshot loads in shipping mode now that every row is traced', () => {
+  const loaded = loadClauseDataset({ mode: 'shipping' });
+  assert.equal(loaded.rows.length, 7);
+  assert.ok(loaded.rows.every((row) => row.isTraced && row.trace_status === 'traced'));
+  assert.deepEqual(loaded.warnings, []);
 });
 
 // 4. Missing mode still fails.

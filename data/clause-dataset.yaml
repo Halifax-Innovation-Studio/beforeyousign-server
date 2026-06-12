@@ -44,6 +44,15 @@
 #   rule_summary rewritten for precision (threshold day 3 / service from
 #   day 4 / 10-day windows; response runs from receipt). The remaining 2 rows
 #   stay placeholder / TO-TRACE. Dataset remains seed-incomplete.
+# 2026-06-11 (T9F): cc-001 and cc-002 traced against official
+#   lease-contact-field sources (RTA s. 7A, added by S.N.S. 2024, c. 12,
+#   s. 5, proclaimed 2025-04-30). valid_from corrected null -> 2025-04-30;
+#   seed five-field framing supported and expanded (property manager and
+#   superintendent also covered, each 'if any'); no split needed (single
+#   provision, single date). All 7 current seed rows are now traced; the
+#   dataset is still seed-incomplete (7 synthetic rows vs the 20-50 target),
+#   not validated, and not ship-ready - traced closes the trace gate for
+#   these rows only.
 # =======================================
 # BYS reference clause dataset — SEED (a37)
 # Status: SEED ONLY — 7 sample rows demonstrating structure. This dataset is
@@ -306,43 +315,93 @@ rows:
   - id: cc-001
     clause_type: completeness-contact-fields
     jurisdiction: NS
-    rule_summary: "Leases must include landlord name, civic address, mailing address, phone, and agent contacts where applicable (a36 feature)."
-    statute_ref: "TO-TRACE (effective date also to confirm during trace)"
+    rule_summary: "A landlord must provide in the lease the name, civic address, mailing address and telephone number of the landlord and, if any, of the landlord's agent, the property manager and the superintendent (a36 feature)."
+    statute_ref: "Residential Tenancies Act, R.S.N.S. 1989, c. 401, s. 7A (added by S.N.S. 2024, c. 12, s. 5)"
     source: *nspage
-    valid_from: null
+    valid_from: 2025-04-30
     valid_to: null
     example_clause_text: "SYNTHETIC: Landlord: J. Example, 100 Example St, Halifax NS B3H 0A1 (civic and mailing); tel 902-555-0100; agent: Example Property Mgmt, 200 Sample Ave, 902-555-0101."
     expected_flag: ok
     expected_explanation_points:
-      - "all five required contact elements present (element-by-element)"
-    notes: "Completeness-positive sample. valid_from null = effective date not stated on the summary page; confirm during trace-to-Act, do not guess."
-    trace_status: placeholder
-    confidence: null
-    trace_sources: []
-    traced_date: null
+      - "all required contact elements present (element-by-element): landlord name, civic address, mailing address and phone, plus the same details for the agent named in the lease"
+      - "agent, property manager and superintendent details are required only if such a person exists"
+    notes: "Completeness-positive sample. Traced 2026-06-11 (T9F). valid_from corrected null -> 2025-04-30 (proclamation date of S.N.S. 2024, c. 12, ss. 4-8; the seed's null was 'to confirm during trace'). Seed's five-field framing supported and expanded: s. 7A(1) requires the four data points for the landlord and, each 'if any', for the agent, property manager and superintendent. NOT modeled: s. 7A(3) transitional cure (a pre-2025-04-30 lease lacking the information may have been validly completed by a separate written notice a lease-document check cannot see); tenant contact fields and electronic addresses (s. 7B is conditional and belongs to es-001's instrument family). The old regulation-based standard form (Form P) was repealed by N.S. Reg. 76/2025 effective 2025-04-30; the Director-prescribed form (RTA s. 8(2A)) corroborates but is not the rule's source. Seed rule_summary was: 'Leases must include landlord name, civic address, mailing address, phone, and agent contacts where applicable (a36 feature).'"
+    trace_status: traced
+    confidence: high
+    trace_sources:
+      - source_type: statute
+        title: "Residential Tenancies Act, R.S.N.S. 1989, c. 401 (official consolidation to October 3, 2025)"
+        url: "https://nslegislature.ca/sites/default/files/legc/statutes/residential%20tenancies.pdf"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "s. 7A; see also ss. 7B, 8(2A)"
+        quote_or_summary: "s. 7A(1): 'A landlord shall, in the lease, provide the tenant with the name, civic address, mailing address and telephone number of (a) the landlord; (b) the agent of the landlord, if any; (c) the property manager of the premises, if any; and (d) the superintendent of the premises, if any.' s. 7A(2): changes are served as written notice within 30 days. s. 7A(3): a lease existing at commencement lacking the information is cured by written notice within 30 days after commencement."
+        notes: "History line: 2024, c. 12, s. 5. Tenant contact fields are not required by s. 7A; s. 7B (electronic address) is conditional only. Checked the Residential Tenancies Regulations (N.S. Reg. 190/1989 as amended to 76/2025): no contact-field requirement; old Form P standard lease form repealed by N.S. Reg. 76/2025 effective 2025-04-30."
+      - source_type: amending-act
+        title: "Bill 467 (as passed) - Interim Residential Rental Increase Cap Act (amended) and Residential Tenancies Act (amended), Chapter 12 of the Acts of 2024"
+        url: "https://nslegislature.ca/legc/bills/64th_1st/3rd_read/b467.htm"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "s. 5 (adds RTA ss. 7A-7C); s. 28 (commencement)"
+        quote_or_summary: "s. 5 adds RTA s. 7A verbatim. s. 28: 'Sections 1 and 2, 4 to 8 and 10 to 23 come into force on such day as the Governor in Council orders and declares by proclamation' - bill s. 5 is inside the proclamation list, so s. 7A did not commence at Royal Assent (2024-09-20)."
+        notes: "Commencement authority pointing to the proclamation record for the in-force date."
+      - source_type: locator
+        title: "Proclamations of Nova Scotia Statutes (Office of the Legislative Counsel proclamation record)"
+        url: "https://nslegislature.ca/legislation/proclamations-nova-scotia-statutes"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "entry for Residential Tenancies Act (R.S. 1989, c. 401)"
+        quote_or_summary: "'amended 2024, c. 12, ss. 4-8, 10-23 -- April 30, 2025' - in-force authority for valid_from 2025-04-30."
+        notes: "Royal Gazette Part II instrument not separately pulled (official OLC record used) - noted per approval-record ruling 5."
+    traced_date: 2026-06-11
   - id: cc-002
     clause_type: completeness-contact-fields
     jurisdiction: NS
     rule_summary: "Same rule as cc-001; required elements missing."
-    statute_ref: "TO-TRACE (same as cc-001)"
+    statute_ref: "Residential Tenancies Act, R.S.N.S. 1989, c. 401, s. 7A (added by S.N.S. 2024, c. 12, s. 5)"
     source: *nspage
-    valid_from: null
+    valid_from: 2025-04-30
     valid_to: null
     example_clause_text: "SYNTHETIC: Landlord: J. Example. Rent payable by e-transfer to the address provided at move-in."
     expected_flag: missing
     expected_explanation_points:
-      - "civic address, mailing address, phone, agent details not found"
-      - "missing-required-information framing; no accusation"
+      - "landlord civic address, mailing address and telephone number not found in the lease"
+      - "agent, property manager and superintendent details are required only if such a person exists, so their absence alone is not a finding"
+      - "missing-required-information framing; no accusation - 'not found in the lease' is not a legal-noncompliance conclusion (a pre-2025-04-30 lease may have been completed by a separate written notice)"
       - "option: request the missing information in writing"
-    notes: "Completeness-negative sample. a36's harmful failure: this row must NEVER score 'ok' or 'present'."
-    trace_status: placeholder
-    confidence: null
-    trace_sources: []
-    traced_date: null
+    notes: "Completeness-negative sample. a36's harmful failure: this row must NEVER score 'ok' or 'present'. Traced 2026-06-11 (T9F); shares cc-001's trace and valid_from correction (null -> 2025-04-30). Explanation points narrowed so only the unconditionally-required landlord fields are named as missing; the s. 7A(3) transitional-notice nuance matters most for this negative row."
+    trace_status: traced
+    confidence: high
+    trace_sources:
+      - source_type: statute
+        title: "Residential Tenancies Act, R.S.N.S. 1989, c. 401 (official consolidation to October 3, 2025)"
+        url: "https://nslegislature.ca/sites/default/files/legc/statutes/residential%20tenancies.pdf"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "s. 7A"
+        quote_or_summary: "s. 7A(1): 'A landlord shall, in the lease, provide the tenant with the name, civic address, mailing address and telephone number of (a) the landlord; (b) the agent of the landlord, if any; (c) the property manager of the premises, if any; and (d) the superintendent of the premises, if any.'"
+        notes: "Same trace as cc-001 (one trace serves the pair). s. 7A(3) transitional cure noted in row notes."
+      - source_type: amending-act
+        title: "Bill 467 (as passed) - Interim Residential Rental Increase Cap Act (amended) and Residential Tenancies Act (amended), Chapter 12 of the Acts of 2024"
+        url: "https://nslegislature.ca/legc/bills/64th_1st/3rd_read/b467.htm"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "s. 5 (adds RTA ss. 7A-7C); s. 28 (commencement)"
+        quote_or_summary: "s. 5 adds RTA s. 7A verbatim; s. 28 places bill s. 5 on proclamation."
+        notes: "Same as cc-001."
+      - source_type: locator
+        title: "Proclamations of Nova Scotia Statutes (Office of the Legislative Counsel proclamation record)"
+        url: "https://nslegislature.ca/legislation/proclamations-nova-scotia-statutes"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "entry for Residential Tenancies Act (R.S. 1989, c. 401)"
+        quote_or_summary: "'amended 2024, c. 12, ss. 4-8, 10-23 -- April 30, 2025'"
+        notes: "Same as cc-001."
+    traced_date: 2026-06-11
 
 gaps_acknowledged:
   - "7 rows vs the 20-50 target (a11 checklist still pending - reference-dataset checklist will govern the full build)."
   - "2 completeness rows vs the >=10/>=10 requirement in a36's success criteria."
   - "No boundary cases yet (exactly-5% increase; notice on day 3 exactly; weekend/holiday date walks)."
-  - "2 of 7 statute_ref fields remain TO-TRACE (sl-001, es-001, rc-001, rc-002 and lp-001 traced 2026-06-11 under the T9 trace plan); no untraced row ships before its trace-to-Act pass."
+  - "0 of 7 statute_ref fields remain TO-TRACE (all 7 seed rows traced 2026-06-11 under the T9 trace plan). Traced means verified against the official text as of that date - it does not make the dataset complete, validated, or ship-ready; the 20-50 row target and real-lease examples remain outstanding."
   - "No real-lease examples; all synthetic. Real anonymized examples are a later, consent-gated step."
