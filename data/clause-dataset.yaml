@@ -30,6 +30,13 @@
 #   2025-04-30 (proclamation date for 2024, c. 12, ss. 4-8, 10-23); seed
 #   rule_summary rewritten/narrowed. The remaining 5 rows stay placeholder /
 #   TO-TRACE. Dataset remains seed-incomplete.
+# 2026-06-11 (T9D): rc-001 and rc-002 traced against official rent-cap
+#   sources (Interim Residential Rental Increase Cap Act, S.N.S. 2021, c. 22,
+#   ss. 3, 4, 7; Cap Regulations, N.S. Reg. 79/2023, ss. 3-4). valid_from
+#   corrected 2026-01-01 -> 2024-01-01 per the approved legal-effective-date
+#   ruling (5% applies to increases from 2024-01-01); valid_to 2027-12-31
+#   supported (Act s. 7(1) expiry). The remaining 3 rows stay placeholder /
+#   TO-TRACE. Dataset remains seed-incomplete.
 # =======================================
 # BYS reference clause dataset — SEED (a37)
 # Status: SEED ONLY — 7 sample rows demonstrating structure. This dataset is
@@ -84,41 +91,90 @@ rows:
   - id: rc-001
     clause_type: rent-escalation
     jurisdiction: NS
-    rule_summary: "Rent increases are capped at 5% per year from 1 Jan 2026; cap regime in place until 31 Dec 2027."
-    statute_ref: "TO-TRACE (Interim Residential Rental Increase Cap Act + RTA)"
+    rule_summary: "For rent increases from 1 Jan 2024 to 31 Dec 2027, a landlord may not increase an existing tenant's rent by more than 5% above the amount the tenant was legally required to pay in the preceding 12-month period; the cap regime expires after 31 Dec 2027."
+    statute_ref: "Interim Residential Rental Increase Cap Act, S.N.S. 2021, c. 22, ss. 3, 4, 7; Interim Residential Rental Increase Cap Regulations, N.S. Reg. 79/2023, ss. 3-4"
     source: *nspage
-    valid_from: 2026-01-01
+    valid_from: 2024-01-01
     valid_to: 2027-12-31
     example_clause_text: "SYNTHETIC: Rent shall increase by 4% on each anniversary of the commencement date."
     expected_flag: ok
     expected_explanation_points:
-      - "increase is within the 5% annual cap currently in force"
+      - "increase is within the 5% cap in force for increases from 1 Jan 2024 to 31 Dec 2027"
+      - "the cap applies to existing tenants (including a new fixed-term lease with the same tenant); exclusions exist (income-based public housing, compliant land-lease communities)"
       - "cap regime ends 31 Dec 2027; what applies after is not yet known"
       - "as-of date of this explanation"
-    notes: "Within-cap case. Pair row for the boundary (exactly 5%) belongs in the full dataset."
-    trace_status: placeholder
-    confidence: null
-    trace_sources: []
-    traced_date: null
+    notes: "Within-cap case. Pair row for the boundary (exactly 5%) belongs in the full dataset. Traced 2026-06-11 (T9D). valid_from corrected 2026-01-01 -> 2024-01-01 per the approved legal-effective-date ruling: 5% is set by N.S. Reg. 79/2023 ss. 3-4 for the 2024 and 2025 periods and by Act s. 4(1)(d)-(e) for 2026-2027 (the seed date was the start of the current-period clause only). The earlier 2% period (to 2023-12-31, s. 4(1)(a)) is NOT modeled by this row. Baseline is the rent legally required in the preceding 12-month period; the cap operates in addition to RTA s. 11 timing/notice restrictions, which are not modeled here. Act s. 5 (tenant reimbursement application) survives to 2028-12-31. Seed rule_summary was: 'Rent increases are capped at 5% per year from 1 Jan 2026; cap regime in place until 31 Dec 2027.'"
+    trace_status: traced
+    confidence: high
+    trace_sources:
+      - source_type: statute
+        title: "Interim Residential Rental Increase Cap Act, S.N.S. 2021, c. 22 (official consolidation to April 30, 2025)"
+        url: "https://nslegislature.ca/sites/default/files/legc/statutes/interim%20residential%20rental%20increase%20cap.pdf"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "ss. 3, 4(1)-(2), 7"
+        quote_or_summary: "s. 4(1): 'a landlord shall not increase the rent payable by an existing tenant by more than ... (b) from January 1, 2024, to December 31, 2024, inclusive, the amount permitted by the regulations; (c) from January 1, 2025, to December 31, 2025, inclusive, the amount permitted by the regulations; (d) from January 1, 2026, to December 31, 2026, inclusive, five per cent; (e) from January 1, 2027, to December 31, 2027, inclusive, five per cent, above the amount that the tenant was legally required to pay in the preceding 12-month period.' s. 7(1): 'This Act, except Section 5, expires and ceases to have any force or effect after December 31, 2027.'"
+        notes: "s. 4 history: 2021, c. 22, s. 4; 2023, c. 7, s. 1; 2024, c. 12, s. 1. s. 3(2)-(3) exclusions: income-based public housing; land-lease communities complying with RTA s. 11B. s. 4(2): applies to a new fixed-term lease with an existing tenant. s. 7(2): s. 5 survives to December 31, 2028."
+      - source_type: regulation
+        title: "Interim Residential Rental Increase Cap Regulations, N.S. Reg. 79/2023 (consolidation)"
+        url: "https://novascotia.ca/just/regulations/regs/irricregs.htm"
+        publisher: "Province of Nova Scotia (Office of the Registrar of Regulations)"
+        retrieved_date: 2026-06-11
+        provision: "ss. 3, 4 (O.I.C. 2023-132; in force May 9, 2023; Royal Gazette Part II issue May 19, 2023)"
+        quote_or_summary: "s. 3: 'The maximum permitted rent increase amount under clause 4(1)(b) of the Act for rent increases from January 1, 2024, to December 31, 2024, inclusive, is 5%.' s. 4: 'The maximum permitted rent increase amount under clause 4(1)(c) of the Act for rent increases from January 1, 2025, to December 31, 2025, inclusive, is 5%.'"
+        notes: "Establishes 5% for the 2024 and 2025 periods, making 2024-01-01 the legal start of the 5% rate. The online consolidation is unofficial (official record: Registrar of Regulations / Royal Gazette Part II); the page's Registrar history table cites the Gazette Part II issue of 2023-05-19. Gazette issue not separately pulled - noted per approval-record ruling 5."
+      - source_type: locator
+        title: "Proclamations of Nova Scotia Statutes (Office of the Legislative Counsel proclamation record)"
+        url: "https://nslegislature.ca/legislation/proclamations-nova-scotia-statutes"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "entry for Interim Residential Rental Increase Cap Act (2021, c. 22)"
+        quote_or_summary: "'amended 2023, c. 7 -- May 9, 2023 amended 2024, c. 12, ss. 1, 2 -- April 30, 2025' - in-force dates for the amendments creating the rate ladder and the 2027 expiry."
+        notes: "2024, c. 12, ss. 1-2 (adding the 2026/2027 five-per-cent clauses and extending expiry to 2027-12-31) were proclaimed in force 2025-04-30 but govern the 2026-2027 periods."
+    traced_date: 2026-06-11
   - id: rc-002
     clause_type: rent-escalation
     jurisdiction: NS
     rule_summary: "Same cap rule as rc-001; clause exceeds it."
-    statute_ref: "TO-TRACE (same as rc-001)"
+    statute_ref: "Interim Residential Rental Increase Cap Act, S.N.S. 2021, c. 22, ss. 3, 4, 7; Interim Residential Rental Increase Cap Regulations, N.S. Reg. 79/2023, ss. 3-4"
     source: *nspage
-    valid_from: 2026-01-01
+    valid_from: 2024-01-01
     valid_to: 2027-12-31
     example_clause_text: "SYNTHETIC: Rent shall increase by 8% annually at the Landlord's discretion."
     expected_flag: flag
     expected_explanation_points:
-      - "8% exceeds the 5% annual cap currently in force"
+      - "8% exceeds the 5% cap in force for increases from 1 Jan 2024 to 31 Dec 2027"
       - "explanation states the rule and the gap; no accusation, no advice on action"
       - "options exist (ask, dispute via Residential Tenancies Program); phrased as options"
-    notes: "Over-cap case. Harmful-failure guard: this row must NEVER score 'ok' (mirror of a36's zero-false-present bar)."
-    trace_status: placeholder
-    confidence: null
-    trace_sources: []
-    traced_date: null
+    notes: "Over-cap case. Harmful-failure guard: this row must NEVER score 'ok' (mirror of a36's zero-false-present bar). Traced 2026-06-11 (T9D); shares rc-001's trace and window correction (valid_from 2026-01-01 -> 2024-01-01 per the legal-effective-date ruling). The 'options exist' point is grounded by Act s. 5 (tenant application to the Director for reimbursement, available until end of 2028). Scope/exclusion nuances as per rc-001 notes."
+    trace_status: traced
+    confidence: high
+    trace_sources:
+      - source_type: statute
+        title: "Interim Residential Rental Increase Cap Act, S.N.S. 2021, c. 22 (official consolidation to April 30, 2025)"
+        url: "https://nslegislature.ca/sites/default/files/legc/statutes/interim%20residential%20rental%20increase%20cap.pdf"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "ss. 3, 4(1)-(2), 5, 7"
+        quote_or_summary: "s. 4(1): five per cent cap for the 2026 and 2027 periods (clauses (d)-(e)), regulation-set amounts for 2024-2025 (clauses (b)-(c)), 'above the amount that the tenant was legally required to pay in the preceding 12-month period.' s. 5(1): a tenant who believes a landlord has imposed an increase in contravention of the Act may apply to the Director for a reimbursement order."
+        notes: "Same trace as rc-001 (one trace serves the pair). s. 7(1) expiry after December 31, 2027; s. 5 survives to December 31, 2028."
+      - source_type: regulation
+        title: "Interim Residential Rental Increase Cap Regulations, N.S. Reg. 79/2023 (consolidation)"
+        url: "https://novascotia.ca/just/regulations/regs/irricregs.htm"
+        publisher: "Province of Nova Scotia (Office of the Registrar of Regulations)"
+        retrieved_date: 2026-06-11
+        provision: "ss. 3, 4 (O.I.C. 2023-132; in force May 9, 2023; Royal Gazette Part II issue May 19, 2023)"
+        quote_or_summary: "ss. 3-4 set the maximum permitted rent increase at 5% for the 2024 and 2025 periods under Act clauses 4(1)(b)-(c)."
+        notes: "Unofficial online consolidation; Registrar history table cites the Gazette Part II issue of 2023-05-19 (not separately pulled - noted per approval-record ruling 5)."
+      - source_type: locator
+        title: "Proclamations of Nova Scotia Statutes (Office of the Legislative Counsel proclamation record)"
+        url: "https://nslegislature.ca/legislation/proclamations-nova-scotia-statutes"
+        publisher: "Office of the Legislative Counsel, Nova Scotia House of Assembly"
+        retrieved_date: 2026-06-11
+        provision: "entry for Interim Residential Rental Increase Cap Act (2021, c. 22)"
+        quote_or_summary: "'amended 2023, c. 7 -- May 9, 2023 amended 2024, c. 12, ss. 1, 2 -- April 30, 2025'"
+        notes: "Same as rc-001."
+    traced_date: 2026-06-11
   - id: lp-001
     clause_type: late-payment-eviction-timeline
     jurisdiction: NS
@@ -256,5 +312,5 @@ gaps_acknowledged:
   - "7 rows vs the 20-50 target (a11 checklist still pending - reference-dataset checklist will govern the full build)."
   - "2 completeness rows vs the >=10/>=10 requirement in a36's success criteria."
   - "No boundary cases yet (exactly-5% increase; notice on day 3 exactly; weekend/holiday date walks)."
-  - "5 of 7 statute_ref fields remain TO-TRACE (sl-001 and es-001 traced 2026-06-11 under the T9 trace plan); no untraced row ships before its trace-to-Act pass."
+  - "3 of 7 statute_ref fields remain TO-TRACE (sl-001, es-001, rc-001 and rc-002 traced 2026-06-11 under the T9 trace plan); no untraced row ships before its trace-to-Act pass."
   - "No real-lease examples; all synthetic. Real anonymized examples are a later, consent-gated step."

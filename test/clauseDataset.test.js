@@ -13,9 +13,9 @@ const {
 } = require('../lib/clauseDataset');
 
 const SEED_ROW_IDS = ['rc-001', 'rc-002', 'lp-001', 'sl-001', 'es-001', 'cc-001', 'cc-002'];
-// T9B traced the calibration row sl-001; T9C traced es-001.
-// The rest remain placeholders.
-const SEED_TRACED_IDS = ['sl-001', 'es-001'];
+// T9B traced the calibration row sl-001; T9C traced es-001; T9D traced the
+// rent-cap pair rc-001/rc-002. The rest remain placeholders.
+const SEED_TRACED_IDS = ['sl-001', 'es-001', 'rc-001', 'rc-002'];
 const SEED_PLACEHOLDER_IDS = SEED_ROW_IDS.filter((id) => !SEED_TRACED_IDS.includes(id));
 
 function makeStatuteSource(overrides = {}) {
@@ -127,6 +127,41 @@ test('seed es-001 row carries a complete official trace with corrected window', 
     /prior, different electronic-service regime|NOT modeled/i.test(row.notes),
     'row notes must preserve the pre-2025 regime limitation'
   );
+});
+
+test('seed rent-cap pair rc-001/rc-002 carries a complete official trace with corrected window', () => {
+  const loaded = loadClauseDataset({ mode: 'eval' });
+  const byId = Object.fromEntries(loaded.rows.map((r) => [r.id, r]));
+  for (const id of ['rc-001', 'rc-002']) {
+    const row = byId[id];
+    assert.ok(row, `${id} must exist`);
+    assert.equal(row.trace_status, 'traced');
+    assert.equal(row.confidence, 'high');
+    assert.ok(!row.statute_ref.startsWith('TO-TRACE'));
+    assert.ok(
+      row.statute_ref.includes('2021, c. 22') && row.statute_ref.includes('79/2023'),
+      `${id} statute_ref must cite the Cap Act and Cap Regulations`
+    );
+    assert.equal(row.valid_from, '2024-01-01', `${id} valid_from must be the legal effective date of the 5% rate`);
+    assert.equal(row.valid_to, '2027-12-31', `${id} valid_to must be the Act expiry date`);
+    assert.equal(row.traced_date, '2026-06-11');
+    assert.ok(row.isTraced);
+    assert.ok(
+      row.trace_sources.some((s) => s.source_type === 'statute') &&
+        row.trace_sources.some((s) => s.source_type === 'regulation'),
+      `${id} must carry both Act and Regulations sources`
+    );
+  }
+  assert.equal(byId['rc-001'].expected_flag, 'ok', 'rc-001 within-cap case stays ok');
+  assert.equal(byId['rc-002'].expected_flag, 'flag', 'rc-002 over-cap case stays flag');
+  assert.ok(/2% period|NOT modeled/i.test(byId['rc-001'].notes), 'rc-001 notes must preserve the pre-2024 limitation');
+  assert.ok(/NEVER score 'ok'/.test(byId['rc-002'].notes), 'rc-002 harmful-failure guard note must survive');
+  // T2 ticket acceptance boundaries against the real dataset:
+  const rcIds = (rows) => rows.map((r) => r.id).filter((id) => id.startsWith('rc-'));
+  assert.deepEqual(rcIds(getApplicableRules(loaded.rows, '2027-12-31')), ['rc-001', 'rc-002'], '2027-12-31 in-window');
+  assert.deepEqual(rcIds(getApplicableRules(loaded.rows, '2028-01-01')), [], '2028-01-01 out-of-window');
+  assert.deepEqual(rcIds(getApplicableRules(loaded.rows, '2024-01-01')), ['rc-001', 'rc-002'], 'valid_from boundary in-window');
+  assert.deepEqual(rcIds(getApplicableRules(loaded.rows, '2023-12-31')), [], 'day before valid_from out-of-window');
 });
 
 test('seed sl-001 row carries a complete official trace', () => {
